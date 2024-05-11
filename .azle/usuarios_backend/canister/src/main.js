@@ -100736,10 +100736,26 @@ var User = Record2({
     segundoApellido: text,
     alias: text
 });
+var Event2 = Record2({
+    id: Principal3,
+    tipoEvento: text,
+    lugarEvento: text
+});
+var Pago = Record2({
+    id: Principal3,
+    cuenta: text
+});
+var Ruta = Record2({
+    id: Principal3,
+    GPS: text
+});
 var AplicationError = Variant2({
     UserDoesNotExist: text
 });
 var users = StableBTreeMap(0);
+var events = StableBTreeMap(0);
+var pagos = StableBTreeMap(0);
+var rutas = StableBTreeMap(0);
 var src_default = Canister({
     createUser: update([
         text,
@@ -100802,6 +100818,59 @@ var src_default = Canister({
         users.remove(Principal3.fromText(userId));
         users.insert(Principal3.fromText(userId), newUser);
         return Ok(newUser);
+    }),
+    createEvent: update([
+        text,
+        text
+    ], Event2, (tipoEvento, lugarEvento)=>{
+        const id2 = generateId();
+        const event = {
+            id: id2,
+            tipoEvento,
+            lugarEvento
+        };
+        events.insert(event.id, event);
+        return event;
+    }),
+    readEvents: query([], Vec2(Event2), ()=>{
+        return events.values();
+    }),
+    readEventsByZone: query([
+        text
+    ], Opt2(Event2), (lugarEvento)=>{
+        return events.get(Principal3.fromText(lugarEvento));
+    }),
+    createPago: update([
+        text
+    ], Pago, (cuenta)=>{
+        const id2 = generateId();
+        const pago = {
+            id: id2,
+            cuenta
+        };
+        pagos.insert(pago.id, pago);
+        return pago;
+    }),
+    readPagos: query([], Vec2(Pago), ()=>{
+        return pagos.values();
+    }),
+    readPagosById: query([
+        text
+    ], Opt2(Pago), (id2)=>{
+        return pagos.get(Principal3.fromText(id2));
+    }),
+    deletePago: update([
+        text
+    ], Result(Pago, AplicationError), (id2)=>{
+        const PagoOpt = pagos.get(Principal3.fromText(id2));
+        if ("None" in PagoOpt) {
+            return Err({
+                UserDoesNotExist: id2
+            });
+        }
+        const pago = PagoOpt.Some;
+        pagos.remove(pago.id);
+        return Ok(pago);
     })
 });
 function generateId() {

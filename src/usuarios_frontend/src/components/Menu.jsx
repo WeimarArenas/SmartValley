@@ -6,7 +6,10 @@ import {  useConnect } from "@connect2ic/react";
 import {BrowserRouter, Route, Link, Routes} from 'react-router-dom';
 import Home from "./Home";
 import Users from "./Users";
+import EventCreate from "./Events";
+import Events from "./EventList"
 import UserCreate from "./UserCreate";
+import Mapa from './map'
 import * as usuarios_backend from "declarations/usuarios_backend";
 
 // import Programas from "./Programas";
@@ -75,6 +78,9 @@ const Menu = () => {
                     <Link to='/' className="navbar-brand">Sistema</Link>
                     <Link to='/nuevo-usuario'className="navbar-brand" >Nuevo</Link>
                     <Link to='/usuarios'className="navbar-brand" id="btnUserList">Usuarios</Link>
+                    <Link to='/events' className="navbar-brand" id="btnUserList">Eventos</Link>
+                    <Link to='/events-list' className="navbar-brand" id="btnUserList">ListaEventos</Link>
+                    <Link to='/map' className="navbar-brand" id="btnUserList">Mapa Muestra</Link>
                     <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                     <span className="navbar-toggler-icon"></span>
                     </button>
@@ -118,6 +124,9 @@ const Menu = () => {
         <Route path="/" element={<Home />} />
         <Route path="/usuarios" element={<Users />} />
         <Route path="/nuevo-usuario" element={<UserCreate />} />
+        <Route path="/events" element={<EventCreate />} />
+        <Route path="/events-list" element={<Events />} />
+        <Route path="/map" element={<Mapa />} />
     </Routes>
 
     </BrowserRouter>
@@ -131,7 +140,7 @@ const client = createClient({
       usuarios_backend,
     },
     providers: [
-      new InternetIdentity({ providerUrl: "http://bw4dl-smaaa-aaaaa-qaacq-cai.localhost:4943" })
+      new InternetIdentity({ providerUrl: "http://bkyz2-fmaaa-aaaaa-qaaaq-cai.localhost:4943/" })
     ],
     globalProviderConfig: {
       /*

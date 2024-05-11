@@ -1,6 +1,13 @@
 service: () -> {
+    createEvent: (text, text) -> (record {id:principal; lugarEvento:text; tipoEvento:text});
+    createPago: (text) -> (record {id:principal; cuenta:text});
     createUser: (text, text, text, text) -> (record {id:principal; alias:text; nombre:text; segundoApellido:text; primerApellido:text});
+    deletePago: (text) -> (variant {Ok:record {id:principal; cuenta:text}; Err:variant {UserDoesNotExist:text}});
     deleteUser: (text) -> (variant {Ok:record {id:principal; alias:text; nombre:text; segundoApellido:text; primerApellido:text}; Err:variant {UserDoesNotExist:text}});
+    readEvents: () -> (vec record {id:principal; lugarEvento:text; tipoEvento:text}) query;
+    readEventsByZone: (text) -> (opt record {id:principal; lugarEvento:text; tipoEvento:text}) query;
+    readPagos: () -> (vec record {id:principal; cuenta:text}) query;
+    readPagosById: (text) -> (opt record {id:principal; cuenta:text}) query;
     readUserById: (text) -> (opt record {id:principal; alias:text; nombre:text; segundoApellido:text; primerApellido:text}) query;
     readUsers: () -> (vec record {id:principal; alias:text; nombre:text; segundoApellido:text; primerApellido:text}) query;
     updateUser: (text, text, text, text, text) -> (variant {Ok:record {id:principal; alias:text; nombre:text; segundoApellido:text; primerApellido:text}; Err:variant {UserDoesNotExist:text}});
