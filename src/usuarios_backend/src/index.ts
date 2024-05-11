@@ -23,13 +23,38 @@ const User = Record({
 });
 type User = typeof User.tsType;
 
+const Event = Record({
+    id: Principal,
+    tipoEvento: text,
+    lugarEvento: text,
+});
+type Event = typeof Event.tsType;
+
+const Pago = Record({
+    id: Principal,
+    cuenta: text
+});
+type Pago = typeof Pago.tsType;
+
+const Ruta = Record({
+    id: Principal,
+    GPS: text
+})
+type Ruta = typeof Ruta.tsType;
+
 const AplicationError = Variant({
     UserDoesNotExist: text
 });
-
+    
 type AplicationError = typeof AplicationError.tsType;
 
 let users = StableBTreeMap<Principal, User>(0);
+
+let events = StableBTreeMap<Principal, Event>(0);
+
+let pagos = StableBTreeMap<Principal, Pago>(0);
+
+let rutas = StableBTreeMap<Principal, Ruta>(0);
 
 export default Canister({
     createUser: update([text, text, text, text], User, (nombre, primerApellido, segundoApellido, alias) => {
@@ -90,7 +115,55 @@ export default Canister({
 
             return Ok(newUser);
         }
-    )
+    ),
+    createEvent: update([text, text], Event, (tipoEvento, lugarEvento) => {
+        const id = generateId();
+        const event: Event = {
+            id:id,
+            tipoEvento: tipoEvento,
+            lugarEvento: lugarEvento,
+        };
+
+        events.insert(event.id, event);
+
+        return event;
+    }),
+    readEvents: query([], Vec(Event), () => {
+        return events.values();
+    }),
+    readEventsByZone: query([text], Opt(Event), (lugarEvento) => {
+        return events.get(Principal.fromText(lugarEvento));
+    }),
+    createPago: update([text], Pago, (cuenta) => {
+        const id = generateId();
+        const pago: Pago = {
+            id:id,
+            cuenta: cuenta,
+        };
+
+        pagos.insert(pago.id, pago);
+
+        return pago;
+    }),
+    readPagos: query([], Vec(Pago), () => {
+        return pagos.values();
+    }),
+    readPagosById: query([text], Opt(Pago), (id) => {
+        return pagos.get(Principal.fromText(id));
+    }),
+    deletePago: update([text], Result(Pago, AplicationError), (id) => {
+        const PagoOpt = pagos.get(Principal.fromText(id));
+
+        if ('None' in PagoOpt) {
+            return Err({
+                UserDoesNotExist: id
+            });
+        }
+
+        const pago = PagoOpt.Some;
+        pagos.remove(pago.id);
+        return Ok(pago);
+    })
 })
 
 function generateId(): Principal {
